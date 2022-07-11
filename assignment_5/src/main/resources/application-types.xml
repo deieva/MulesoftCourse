@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="newSong" format="json">
+      <types:shape format="weave" example="examples/musicExample-1.json"><![CDATA[%dw 2.0
+
+type newSong = {|
+  song: {|
+    musicID: String, 
+    newMusicName: String
+  |}
+|} {"example": "{\\\"song\\\":{\\\"musicID\\\":\\\"5\\\",\\\"newMusicName\\\":\\\"It's a Wonderful Life\\\"}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#429587e3-51d6-4c32-81c0-e11a128affb1">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="newSong"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#d14e9ebd-54f9-4943-8ca4-99e493dbd97e">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="newSong"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#3dfff81d-0b87-4981-a720-2152afa5f905">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="newSong"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#670a6588-9ed4-4a2f-a8fe-fb353acebcfa">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="newSong"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

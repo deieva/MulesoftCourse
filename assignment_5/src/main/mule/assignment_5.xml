@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="get_all_the_records_of_the_musics_table" doc:id="37d1e053-6e8d-4c0a-afce-87d9c196b2f2" >
+		<http:listener doc:name="Listener" doc:id="ba96d11b-6f7f-487c-8930-7b3503d18216" config-ref="HTTP_Listener_config" path="/musics" allowedMethods="GET"/>
+		<db:select doc:name="Select all the records" doc:id="859fb72c-5eb2-4311-ac4e-22844f1f682c" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * from musics;]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="b07deca8-4959-4b6c-a1e2-5dc83524d4ae" message="#[%dw 2.0&#10;&#10;output application/json&#10;---&#10;payload]"/>
+		<set-payload value='#[%dw 2.0&#10;&#10;output application/json&#10;---&#10;{&#10;	"musicRecords": payload&#10;}]' doc:name="Set Payload" doc:id="1131685f-e74a-4a4e-b64b-153b1c85f274" />
+	</flow>
+	<flow name="insert_a_new_record_in_the_musics_table" doc:id="a823ac47-bfc4-4505-81d3-376106113ad8" >
+		<http:listener doc:name="Listener" doc:id="4cf28375-a24d-4579-a96d-426d92dc62a5" config-ref="HTTP_Listener_config" path="/musics"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ca7111be-7138-4c59-a5d6-7a95b3f1ed77" message='#["Log before notification"]'/>
+		<db:insert doc:name="Insert" doc:id="670a6588-9ed4-4a2f-a8fe-fb353acebcfa" config-ref="Database_Config" autoGenerateKeys="true">
+			<db:sql ><![CDATA[INSERT INTO musics (musicName) VALUES (:song)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'song': payload.song.newMusicName
+}]]]></db:input-parameters>
+		</db:insert>
+		<choice doc:name="validate insert" doc:id="429587e3-51d6-4c32-81c0-e11a128affb1" >
+			<when expression="#[payload.affectedRows &gt; 0]">
+				<set-payload value='#[%dw 2.0&#10;&#10;output application/json&#10;---&#10;{&#10;	"SUCCESS": payload&#10;}]' doc:name="Set Payload with success message" doc:id="d14e9ebd-54f9-4943-8ca4-99e493dbd97e" />
+				<logger level="INFO" doc:name="Logger" doc:id="09d41892-6010-4ebd-bb65-9be9aa9003d2" message='#["a database call to insert a new log has been performed"]' />
+			</when>
+			<otherwise >
+				<set-payload value='#[%dw 2.0&#10;&#10;output application/json&#10;---&#10;{&#10;	"INSUCCESS": payload&#10;}]' doc:name="Set Payload with insuccess message" doc:id="3dfff81d-0b87-4981-a720-2152afa5f905" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
